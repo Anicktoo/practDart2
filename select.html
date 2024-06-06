@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>MySQL на Dart</title>
+</head>
+<style>
+    body {
+        font-family: sans-serif;
+        text-align: center;
+    }
+
+    table {
+        width: 93%;
+        margin-left: auto;
+        margin-right: auto;
+        text-align: left;
+        border-collapse: collapse;
+        table-layout: fixed;
+    }
+
+    tr:nth-child(odd) {
+        background: #2db7f8;
+    }
+
+    tr:nth-child(even) {
+        background: #41c7ff;
+    }
+
+    tr:first-child {
+        background: #025a9a;
+        font-weight: bold;
+    }
+
+    tr {
+        opacity: 0.77;
+    }
+
+    tr:nth-child(n+2):hover {
+        color: #fff;
+        cursor: pointer;
+        font-weight: bold;
+        background: #4083b3;
+    }
+
+    td {
+        padding: 5px;
+        position: relative;
+        border: 1px solid #333;
+        height: 20px;
+    }
+
+    td:first-child {
+        width: 35px;
+        text-align: center;
+    }
+
+    h1,
+    h1 a:visited {
+        color: #04599c;
+        background: #fff;
+        font-size: 30px;
+        font-family: Roboto, Geneva, Arial, Helvetica, sans-serif;
+    }
+
+    h1 a:hover {
+        color: #2db7f8;
+    }
+
+    a {
+        text-decoration: none;
+    }
+
+    label {
+        font-size: 16px;
+        text-decoration: underline;
+        margin-left: 5px;
+    }
+
+    div {
+        display: contents;
+        font-size: 21px;
+        font-weight: bold;
+    }
+
+    label {
+        width: max-content;
+    }
+
+    input {
+        width: max-content;
+    }
+
+    input[type="submit"] {
+        cursor: pointer;
+        padding: 10px;
+        grid-column-start: 1;
+        grid-column-end: 1;
+    }
+
+    input[type="text"] {
+        font-style: italic;
+    }
+
+
+
+    #myForm {
+        display: grid;
+        gap: 10px;
+        grid-template-columns: auto auto auto;
+        /* flex-direction: column; */
+        /* flex-wrap: wrap; */
+    }
+
+    #myForm div {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+</style>
+
+<body>
+    <h1><a href=".">Как можно работать с таблицами в MySQL на Dart</a></h1>
+    <form id="myForm">
+        <div>
+            <label for="col1">Фамилия</label>
+            <input type="text" id="col1" name="col1" placeholder="Фамилия" required />
+        </div>
+
+        <div>
+            <label for="col2">Имя</label>
+            <input type="text" id="col2" name="col2" placeholder="Имя" required />
+        </div>
+
+        <div>
+            <label for="col3">Отчество</label>
+            <input type="text" id="col3" name="col3" placeholder="Отчество" />
+        </div>
+
+        <div>
+            <label for="passport">Паспорт</label>
+            <input type="text" id="passport" name="passport" placeholder="Паспорт" required />
+        </div>
+
+        <div>
+            <label for="tax_number">ИНН</label>
+            <input type="text" id="tax_number" name="tax_number" placeholder="ИНН" required />
+        </div>
+
+        <div>
+            <label for="social_number">СНИЛС</label>
+            <input type="text" id="social_number" name="social_number" placeholder="СНИЛС" required />
+        </div>
+
+        <div>
+            <label for="driver_license">Водительские права</label>
+            <input type="text" id="driver_license" name="driver_license" placeholder="Водительские права" />
+        </div>
+        <div>
+            <label for="documents">Дополнительные документы</label>
+            <input type="text" id="documents" name="documents" placeholder="Дополнительные документы" />
+        </div>
+        <div>
+            <label for="notes">Примечание</label>
+            <input type="text" id="notes" name="notes" placeholder="Примечание" />
+        </div>
+        <input type="submit" value="Добавить" />
+    </form>
+    <br />
+    @tr
+    <p>Версия базы данных:
+        <b>
+            @ver
+        </b>
+    </p>
+    <script>
+        document.getElementById('myForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+            const params = new URLSearchParams(formData).toString();
+            const keys = formData.keys();
+            for (let key of keys) {
+                formData.set(key, formData.get(key).trim());
+            }
+            fetch(`${form.action}?${params}`, {
+                method: 'GET'
+            }).then(response => {
+                if (response.ok) {
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1000);
+                } else {
+                    console.error(response.error);
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
