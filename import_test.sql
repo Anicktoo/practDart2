@@ -1,27 +1,112 @@
--- Creation of a test base...
 CREATE DATABASE test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 USE test;
 
-CREATE TABLE Individuals (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    last_name VARCHAR(50) NOT NULL,
-    first_name VARCHAR(50) NOT NULL,
-    middle_name VARCHAR(50),
-    passport VARCHAR(10),
-    tax_number VARCHAR(12),
-    social_number VARCHAR(11) NOT NULL,
-    driver_license VARCHAR(10),
-    documents TEXT(255),
+CREATE TABLE Sector (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    coordinates VARCHAR(50),
+    light_intensity FLOAT,
+    foreign_objects INT UNSIGNED,
+    star_objects INT UNSIGNED,
+    undefined_objects INT UNSIGNED,
+    identified_objects INT UNSIGNED,
+    notes TEXT
+);
+
+CREATE TABLE Objects (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    type VARCHAR(50),
+    accuracy FLOAT,
+    quantity INT UNSIGNED,
+    time TIME,
+    date DATE,
     notes TEXT(255)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
+);
+
+CREATE TABLE Natural_objects (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    type VARCHAR(50),
+    galaxy VARCHAR(50),
+    accuracy FLOAT,
+    light_flux FLOAT,
+    associated_objects INT UNSIGNED,
+    notes TEXT(255)
+);
+
+CREATE TABLE Location (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    earth_position VARCHAR(255),
+    sun_position VARCHAR(255),
+    moon_position VARCHAR(255),
+    notes TEXT(255)
+);
+
+CREATE TABLE Observation (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    sector_id INT,
+    object_id INT,
+    natural_object_id INT,
+    location_id INT,
+    date_update DATETIME,
+    observer_notes TEXT,
+    FOREIGN KEY (sector_id) REFERENCES Sector(id),
+    FOREIGN KEY (object_id) REFERENCES Objects(id),
+    FOREIGN KEY (natural_object_id) REFERENCES Natural_objects(id),
+    FOREIGN KEY (location_id) REFERENCES Location(id)
+);
+
+INSERT INTO Sector (coordinates, light_intensity, foreign_objects, star_objects, undefined_objects, identified_objects, notes)
+VALUES 
+    ('10.123, 20.456', 0.8, 2, 5, 1, 6, 'Sector near Orion Nebula'),
+    ('30.789, 40.012', 0.6, 3, 7, 2, 8, 'Sector near Andromeda Galaxy'),
+    ('50.234, 60.789', 0.7, 1, 4, 0, 5, 'Sector near Pleiades Cluster');
+
+INSERT INTO Objects (type, accuracy, quantity, time, date, notes)
+VALUES 
+    ('Satellite', 0.95, 1, '12:00:00', '2024-06-01', 'Weather monitoring satellite'),
+    ('Space Station', 0.98, 1, '14:30:00', '2024-06-02', 'International Space Station'),
+    ('Debris', 0.70, 5, '16:45:00', '2024-06-03', 'Debris from old satellite');
+
+INSERT INTO Natural_objects(type, galaxy, accuracy, light_flux, associated_objects, notes)
+VALUES 
+    ('Star', 'Milky Way', 0.99, 1.2e+30, 3, 'Nearby star in the Milky Way'),
+    ('Planet', 'Milky Way', 0.95, 3.3e+24, 1, 'Planet in the Milky Way galaxy'),
+    ('Galaxy', 'Andromeda', 0.90, 5.0e+35, 0, 'Andromeda Galaxy'),
+    ('Asteroid', 'Solar System', 0.85, 4.5e+18, 0, 'Asteroid in the asteroid belt'),
+    ('Comet', 'Solar System', 0.80, 1.0e+15, 0, 'Comet passing near Earth'),
+    ('Nebula', 'Milky Way', 0.88, 2.5e+28, 2, 'Nebula observed in the Milky Way');
+
+INSERT INTO Location(earth_position, sun_position, moon_position, notes)
+VALUES 
+    ('10.123, 20.456', '30.789, 40.012', '15.678, 25.123', 'Observation made from Earth to Sun direction'),
+    ('30.789, 40.012', '50.234, 60.789', '35.678, 45.123', 'Observation made from Earth'),
+    ('50.234, 60.789', '10.123, 20.456', '55.678, 65.123', 'Observation made from Earth to Moon direction');
 
 
-INSERT INTO Individuals (last_name, first_name, middle_name, passport, tax_number, social_number, driver_license, documents, notes)
-VALUES
-('Ivanov', 'Ivan', 'Ivanovich', '4510123456', '770123456789', '12345678901', '5012345678', 'Passport copy, lease agreement', 'Excellent client with good credit history'),
-('Petrova', 'Anna', 'Sergeevna', '4510234567', '780234567890', '23456789012', '5012346789', 'Passport copy, income statement', 'Regular client, always pays on time'),
-('Sidorova', 'Maria', 'Alexandrovna', '4510345678', '773456789012', '34567890123', '5012347890', 'Passport copy, employment contract', 'New client, additional verification required'),
-('Kuznetsov', 'Dmitry', 'Petrovich', '4510456789', '774567890123', '45678901234', '5012348901', 'Passport copy, bank statement', 'High-income client'),
-('Smirnova', 'Ekaterina', 'Vladimirovna', '4510567890', '775678901234', '56789012345', '5012349012', 'Passport copy, sale agreement', 'Client with stable financial situation'),
-('Popov', 'Alexey', 'Igorevich', '4510678901', '776789012345', '67890123456', '5012340123', 'Passport copy, tax certificate', 'Client with previous loans in other banks');
+INSERT INTO Observation (sector_id, object_id, natural_object_id, location_id, observer_notes, date_update)
+VALUES 
+    (1, 1, NULL, 1, 'Weather monitoring satellite observed in sector 1', NOW()),
+    (2, 2, NULL, 2, 'International Space Station observed in sector 2', NOW()),
+    (3, 3, NULL, 3, 'Debris from old satellite detected in sector 3', NOW()),
+    (1, NULL, 1, 1, 'Bright star observed in sector 1', NOW()),
+    (2, NULL, 2, 2, 'Planet observed in sector 2', NOW()),
+    (3, NULL, 3, 3, 'Asteroids detected in sector 3', NOW()),
+    (3, NULL, 4, 3, 'Galaxy Andromeda observed in sector 3', NOW()),
+    (2, NULL, 5, 2, 'Comet observed in sector 2', NOW()),
+    (3, NULL, 6, 3, 'Nebula detected in sector 3', NOW());
+
+delimiter //
+
+CREATE PROCEDURE observation_and_natural_objects()
+observation_and_natural_objects: BEGIN
+    SELECT natural_object_id AS id, date_update, sector_id, location_id, type, galaxy, accuracy, light_flux, associated_objects, observer_notes, notes FROM Observation JOIN Natural_objects ON (Observation.natural_object_id=Natural_objects.id);
+END//
+
+CREATE TRIGGER update_date_trigger
+BEFORE UPDATE ON Observation
+FOR EACH ROW
+BEGIN
+    SET NEW.date_update = NOW();
+END//
+
+delimiter ;

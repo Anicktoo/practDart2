@@ -5,12 +5,11 @@ import 'package:mysql_client/mysql_client.dart';
 
 var hostDockerInternalAddress;
 final collation = "utf8mb4_unicode_ci";
-// final codec = const Windows1252Codec(allowInvalid: true);
 
 void main() async {
   var server = await HttpServer.bind(InternetAddress.anyIPv4, 8888);
-  print('Listening for connections on http://host.docker.internal:8888/');
   hostDockerInternalAddress = await getHostDockerInternalAddress();
+  print('Listening for connections on ${hostDockerInternalAddress}:8888/');
 
   await server.forEach((HttpRequest request) {
     switch (request.uri.path) {
@@ -34,7 +33,8 @@ void main() async {
 
 Future<String> getHostDockerInternalAddress() async {
   final addresses = await InternetAddress.lookup('host.docker.internal');
-  return addresses.isNotEmpty ? addresses.first.address : '192.168.0.102';
+  // return addresses.isNotEmpty ? addresses.first.address : '192.168.0.101';
+  return '192.168.0.101';
 }
 
 void ReadTpl(res) async {
@@ -65,20 +65,22 @@ Future<void> viewSelect(res) async {
     );
     await conn.connect();
     res.write('<table>');
-    var heads = await conn.execute("SHOW COLUMNS FROM Individuals");
+    // var table = await conn.execute("CALL observation_and_natural_objects();");
+    var table = await conn.execute("call observation_and_natural_objects();");
+    final heads = table.cols;
+
     res.write('<tr>');
-    for (var head in heads.rows) {
-      res.write('<td>${head.colAt(0)}</td>');
+    for (var head in heads) {
+      res.write('<td>${head}</td>');
     }
     res.write('</tr>');
 
-    var table = await conn.execute(
-        "SELECT * FROM Individuals ORDER BY last_name, first_name, middle_name");
     final numOfCols = table.numOfColumns;
     for (var row in table.rows) {
       res.write('<tr>');
       for (var i = 0; i < numOfCols; i++) {
         var val = row.colAt(i);
+        print(val);
         res.write('<td>${val}</td>');
       }
       res.write('</tr>');
@@ -125,7 +127,7 @@ Future<void> rowInsert(mass) async {
       i++;
     });
     sValue =
-        'INSERT INTO Individuals (last_name, first_name, middle_name, passport, tax_number, social_number, driver_license, documents, notes) VALUES ($sValue)';
+        'INSERT INTO Natural_objects (type, galaxy, accuracy, light_flux, associated_objects, notes) VALUES ($sValue)';
 
     final conn = await MySQLConnection.createConnection(
         host: hostDockerInternalAddress,

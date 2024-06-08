@@ -121,83 +121,71 @@
 </style>
 
 <body>
-    <h1><a href=".">Как можно работать с таблицами в MySQL на Dart</a></h1>
-    <form id="myForm">
-        <div>
-            <label for="col1">Фамилия</label>
-            <input type="text" id="col1" name="col1" placeholder="Фамилия" required />
-        </div>
+    <h1><a href=".">Добавление в таблицу Natural_objects</a></h1>
+    <h3>В рамках лабораторной, запись в таблицу Observation, которая выводится через JOIN с Natural_objects будет создана автоматически</h2>
+        <form id="myForm">
+            <div>
+                <label for="type">Тип объекта</label>
+                <input type="text" id="type" name="type" placeholder="Тип объекта" required />
+            </div>
 
-        <div>
-            <label for="col2">Имя</label>
-            <input type="text" id="col2" name="col2" placeholder="Имя" required />
-        </div>
+            <div>
+                <label for="galaxy">Галактика</label>
+                <input type="text" id="galaxy" name="galaxy" placeholder="Галактика" required />
+            </div>
 
-        <div>
-            <label for="col3">Отчество</label>
-            <input type="text" id="col3" name="col3" placeholder="Отчество" />
-        </div>
+            <div>
+                <label for="accuracy">Точность</label>
+                <input type="number" id="accuracy" name="accuracy" placeholder="Точность" from="0" to="1" step="0.01" required />
+            </div>
 
-        <div>
-            <label for="passport">Паспорт</label>
-            <input type="text" id="passport" name="passport" placeholder="Паспорт" required />
-        </div>
+            <div>
+                <label for="light_flux">Cветовой поток</label>
+                <input type="number" id="light_flux" name="light_flux" placeholder="Cветовой поток" required />
+            </div>
 
-        <div>
-            <label for="tax_number">ИНН</label>
-            <input type="text" id="tax_number" name="tax_number" placeholder="ИНН" required />
-        </div>
+            <div>
+                <label for="associated_objects">Cопряженные объекты</label>
+                <input type="number" id="associated_objects" name="associated_objects" placeholder="Cопряженные объекты" from="0" required />
+            </div>
 
-        <div>
-            <label for="social_number">СНИЛС</label>
-            <input type="text" id="social_number" name="social_number" placeholder="СНИЛС" required />
-        </div>
-
-        <div>
-            <label for="driver_license">Водительские права</label>
-            <input type="text" id="driver_license" name="driver_license" placeholder="Водительские права" />
-        </div>
-        <div>
-            <label for="documents">Дополнительные документы</label>
-            <input type="text" id="documents" name="documents" placeholder="Дополнительные документы" />
-        </div>
-        <div>
-            <label for="notes">Примечание</label>
-            <input type="text" id="notes" name="notes" placeholder="Примечание" />
-        </div>
-        <input type="submit" value="Добавить" />
-    </form>
-    <br />
-    @tr
-    <p>Версия базы данных:
-        <b>
-            @ver
-        </b>
-    </p>
-    <script>
-        document.getElementById('myForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const form = event.target;
-            const formData = new FormData(form);
-            const params = new URLSearchParams(formData).toString();
-            const keys = formData.keys();
-            for (let key of keys) {
-                formData.set(key, formData.get(key).trim());
-            }
-            fetch(`${form.action}?${params}`, {
-                method: 'GET'
-            }).then(response => {
-                if (response.ok) {
-                    window.history.replaceState({}, document.title, window.location.pathname);
-                    setTimeout(() => {
-                        location.reload();
-                    }, 1000);
-                } else {
-                    console.error(response.error);
+            <div>
+                <label for="notes">Примечание</label>
+                <input type="text" id="notes" name="notes" placeholder="Примечание" />
+            </div>
+            <input type="submit" value="Добавить" />
+        </form>
+        <br />
+        @tr
+        <p>Версия базы данных:
+            <b>
+                @ver
+            </b>
+        </p>
+        <script>
+            document.getElementById('myForm').addEventListener('submit', function(event) {
+                event.preventDefault();
+                const form = event.target;
+                const formData = new FormData(form);
+                const params = new URLSearchParams(formData).toString();
+                const keys = formData.keys();
+                for (let key of keys) {
+                    formData.set(key, formData.get(key).trim());
                 }
+                fetch(`${form.action}?${params}`, {
+                    method: 'GET'
+                }).then(response => {
+                    if (response.ok) {
+                        window.history.replaceState({}, document.title, window.location.pathname);
+                        setTimeout(() => {
+                            location.reload();
+                        }, 1000);
+                    } else {
+                        console.error(response.error);
+                    }
+                });
             });
-        });
-    </script>
+        </script>
 </body>
 
 </html>
