@@ -3,7 +3,7 @@ CREATE DATABASE test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE test;
 
 CREATE TABLE Sector (
-    id INT PRIMARY KEY AUTO_INCREMENT,
+    sector_id INT PRIMARY KEY AUTO_INCREMENT,
     coordinates VARCHAR(50),
     light_intensity FLOAT,
     foreign_objects INT UNSIGNED,
@@ -14,7 +14,7 @@ CREATE TABLE Sector (
 );
 
 CREATE TABLE Objects (
-    id INT PRIMARY KEY AUTO_INCREMENT,
+    object_id INT PRIMARY KEY AUTO_INCREMENT,
     type VARCHAR(50),
     accuracy FLOAT,
     quantity INT UNSIGNED,
@@ -24,7 +24,7 @@ CREATE TABLE Objects (
 );
 
 CREATE TABLE Natural_objects (
-    id INT PRIMARY KEY AUTO_INCREMENT,
+    natural_object_id INT PRIMARY KEY AUTO_INCREMENT,
     type VARCHAR(50),
     galaxy VARCHAR(50),
     accuracy FLOAT,
@@ -34,7 +34,7 @@ CREATE TABLE Natural_objects (
 );
 
 CREATE TABLE Location (
-    id INT PRIMARY KEY AUTO_INCREMENT,
+    location_id INT PRIMARY KEY AUTO_INCREMENT,
     earth_position VARCHAR(255),
     sun_position VARCHAR(255),
     moon_position VARCHAR(255),
@@ -42,17 +42,17 @@ CREATE TABLE Location (
 );
 
 CREATE TABLE Observation (
-    id INT PRIMARY KEY AUTO_INCREMENT,
+    observation_id INT PRIMARY KEY AUTO_INCREMENT,
     sector_id INT,
     object_id INT,
     natural_object_id INT,
     location_id INT,
     date_update DATETIME,
     observer_notes TEXT,
-    FOREIGN KEY (sector_id) REFERENCES Sector(id),
-    FOREIGN KEY (object_id) REFERENCES Objects(id),
-    FOREIGN KEY (natural_object_id) REFERENCES Natural_objects(id),
-    FOREIGN KEY (location_id) REFERENCES Location(id)
+    FOREIGN KEY (sector_id) REFERENCES Sector(sector_id),
+    FOREIGN KEY (object_id) REFERENCES Objects(object_id),
+    FOREIGN KEY (natural_object_id) REFERENCES Natural_objects(natural_object_id),
+    FOREIGN KEY (location_id) REFERENCES Location(location_id)
 );
 
 INSERT INTO Sector (coordinates, light_intensity, foreign_objects, star_objects, undefined_objects, identified_objects, notes)
@@ -98,8 +98,8 @@ VALUES
 delimiter //
 
 CREATE PROCEDURE observation_and_natural_objects()
-observation_and_natural_objects: BEGIN
-    SELECT natural_object_id AS id, date_update, sector_id, location_id, type, galaxy, accuracy, light_flux, associated_objects, observer_notes, notes FROM Observation JOIN Natural_objects ON (Observation.natural_object_id=Natural_objects.id);
+BEGIN
+    SELECT * FROM Observation NATURAL JOIN Natural_objects;
 END//
 
 CREATE TRIGGER update_date_trigger

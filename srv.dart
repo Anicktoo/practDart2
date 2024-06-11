@@ -5,11 +5,12 @@ import 'package:mysql_client/mysql_client.dart';
 
 var hostDockerInternalAddress;
 final collation = "utf8mb4_unicode_ci";
+// final codec = const Windows1252Codec(allowInvalid: true);
 
 void main() async {
   var server = await HttpServer.bind(InternetAddress.anyIPv4, 8888);
+  print('Listening for connections on http://host.docker.internal:8888/');
   hostDockerInternalAddress = await getHostDockerInternalAddress();
-  print('Listening for connections on ${hostDockerInternalAddress}:8888/');
 
   await server.forEach((HttpRequest request) {
     switch (request.uri.path) {
@@ -33,8 +34,7 @@ void main() async {
 
 Future<String> getHostDockerInternalAddress() async {
   final addresses = await InternetAddress.lookup('host.docker.internal');
-  // return addresses.isNotEmpty ? addresses.first.address : '192.168.0.101';
-  return '192.168.0.101';
+  return addresses.isNotEmpty ? addresses.first.address : '192.168.0.102';
 }
 
 void ReadTpl(res) async {
@@ -55,6 +55,8 @@ void ReadTpl(res) async {
 
 Future<void> viewSelect(res) async {
   try {
+    final name1 = "Observation";
+    final name2 = "Natural_objects";
     final conn = await MySQLConnection.createConnection(
       host: hostDockerInternalAddress,
       port: 3306,
@@ -65,22 +67,19 @@ Future<void> viewSelect(res) async {
     );
     await conn.connect();
     res.write('<table>');
-    // var table = await conn.execute("CALL observation_and_natural_objects();");
-    var table = await conn.execute("call observation_and_natural_objects();");
-    final heads = table.cols;
-
+    var table =
+        await conn.execute("SELECT * FROM ${name1} NATURAL JOIN ${name2}");
+    final numOfCols = table.numOfColumns;
     res.write('<tr>');
-    for (var head in heads) {
-      res.write('<td>${head}</td>');
+    for (var col in table.cols) {
+      res.write('<td>${col.name}</td>');
     }
     res.write('</tr>');
 
-    final numOfCols = table.numOfColumns;
     for (var row in table.rows) {
       res.write('<tr>');
       for (var i = 0; i < numOfCols; i++) {
         var val = row.colAt(i);
-        print(val);
         res.write('<td>${val}</td>');
       }
       res.write('</tr>');
@@ -114,6 +113,7 @@ Future<void> viewVer(res) async {
   }
 }
 
+var id = 7;
 Future<void> rowInsert(mass) async {
   try {
     print('rowInsert');
@@ -128,7 +128,9 @@ Future<void> rowInsert(mass) async {
     });
     sValue =
         'INSERT INTO Natural_objects (type, galaxy, accuracy, light_flux, associated_objects, notes) VALUES ($sValue)';
-
+    String sValue2 =
+        "INSERT INTO Observation (sector_id, object_id, natural_object_id, location_id, observer_notes, date_update) VALUES (1, NULL, ${id}, 1, 'Some notes', NOW())";
+    id++;
     final conn = await MySQLConnection.createConnection(
         host: hostDockerInternalAddress,
         port: 3306,
@@ -138,6 +140,8 @@ Future<void> rowInsert(mass) async {
         collation: collation);
     await conn.connect();
     await conn.execute(sValue);
+    await Future.delayed(Duration(milliseconds: 500));
+    await conn.execute(sValue2);
     await conn.close();
     print('Insert into table is good.');
   } on Exception catch (e) {
