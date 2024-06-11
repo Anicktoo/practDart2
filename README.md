@@ -1,7 +1,8 @@
-# practDart
+# practDart 2
 
 Демонстрация работы сервера:
-![image](https://github.com/Anicktoo/practDart-main/assets/120019404/e20de47b-a659-4dd1-8c63-173f1e7fb0fc)
+
+![image_2024-06-11_15-51-49](https://github.com/Anicktoo/practDart2/assets/120019404/8b73af2a-9ac4-4b3d-9f65-418ea52de14f)
 
 
 В лабораторной работе для контейнеризации применяется Docker. Для запуска сервера необходимо:
