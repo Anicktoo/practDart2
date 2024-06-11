@@ -19,10 +19,6 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: my_dart_app_2
-    environment:
-      DB_USER: root
-      DB_PASSWORD: qwerty
-      DB_NAME: test
     depends_on:
       - mysql
     links:
